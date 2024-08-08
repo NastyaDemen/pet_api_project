@@ -1,0 +1,103 @@
+Базовый позитивный случай:
+Метод API     GET                                       Результат выполнения
+                                                        Заголовки ответа содержат:
+http: // 34.141.58.52: 8000 / pet/ {id}
+Headers: 'Authorization': f'Bearer {my_token}'
+Paramenters: {pet_id}
+                                                        content-length: 315
+                                                        content-type: application/json
+                                                        date: дата
+                                                        server: uvicorn
+                                                        Код ответа 200 (OK)
+                                                        В теле приходит json с корректной структурой
+                                                        В теле приходит id, имя, тип, возраст, пол животного
+														id и имя владельца, ссылка на аватар, количество лайков, лайк владельца, комментарии
+														  
+
+Негативный тест с некорректным токеном
+Метод API     GET
+http: // 34.141.58.52: 8000 / pet/ {id}
+Headers: 'Authorization': f'Bearer {not_my_token}'       Код ответа 403 (Forbidden)
+Paramenters: {pet_id}
+
+Негативный тест с не существующим id животного
+Метод API     GET
+http: // 34.141.58.52: 8000 / pet/ {id}
+Headers: 'Authorization': f'Bearer {my_token}'       
+Paramenters: {not_existed_pet_id}                        Код ответа 404 (Not Found)
+
+Негативный тест с id животного не integer
+Метод API     GET
+http: // 34.141.58.52: 8000 / pet/ {id}
+Headers: 'Authorization': f'Bearer {my_token}'       
+Paramenters: {not_int_pet_id}                            Код ответа 400 (Bad Request)
+
+Деструктивное тестирование
+пытаемся сломать систему, вызывая  эндпоинт метода get с неподдерживаемым типом запроса
+PUT/PATCH/DELETE http: // 34.141.58.52: 8000 / pet/ {id}
+
+
+Базовый позитивный случай:
+Метод API POST                                          Результат выполнения
+http: // 34.141.58.52: 8000 / login
+Headers: 'Authorization': f'Bearer {my_token}'          Заголовки ответа содержат:
+No parameters                                           access-control-allow-credentials: true
+Body: email, password                                   content-length: 191 
+                                                        content-type: application/json 
+														date: дата
+														server: uvicorn
+														Код ответа 200 (OK)
+                                                        В теле приходит json с корректной структурой
+                                                        В теле приходит token, email, id пользователя
+
+
+Негативный тест неверный email                          
+http: // 34.141.58.52: 8000 / login                     Код ответа 400 (Bad Request)
+Headers: 'Authorization': f'Bearer {my_token}'          В теле приходит json с корректной структурой
+No parameters                                           В теле приходит json с текстом "Username is taken or pass issue"
+Body: email, password
+
+Негативный тест неверный password
+http: // 34.141.58.52: 8000 / login                     Код ответа 400 (Bad Request)
+Headers: 'Authorization': f'Bearer {my_token}'          В теле приходит json с корректной структурой
+No parameters                                           В теле приходит json с текстом "Username is taken or pass issue"
+Body: email, password
+
+Негативный тест email/password удаленного пользователя                          
+http: // 34.141.58.52: 8000 / login                     Код ответа 400 (Bad Request)
+Headers: 'Authorization': f'Bearer {my_token}'          В теле приходит json с корректной структурой
+No parameters                                           В теле приходит json с текстом "Username is taken or pass issue"
+Body: email, password
+
+Негативный 	тест пустой email												
+http: // 34.141.58.52: 8000 / login                     Код ответа 400 (Bad Request)
+Headers: 'Authorization': f'Bearer {my_token}'          В теле приходит json с корректной структурой
+No parameters                                           В теле приходит json с текстом "Username is taken or pass issue"  
+Body: email, password
+														
+Негативный 	тест пустой password															
+http: // 34.141.58.52: 8000 / login                     Код ответа 400 (Bad Request)
+Headers: 'Authorization': f'Bearer {my_token}'          В теле приходит json с корректной структурой
+No parameters                                           В теле приходит json с текстом "Username is taken or pass issue"
+Body: email, password
+														
+Негативный 	тест пустые email и password														
+http: // 34.141.58.52: 8000 / login                     Код ответа 400 (Bad Request)
+Headers: 'Authorization': f'Bearer {my_token}'          В теле приходит json с корректной структурой
+No parameters                                           В теле приходит json с текстом "Username is taken or pass issue"
+Body: email, password
+
+Пользовательский сценарий проверки бизнес-логики
+Как клиент приложения, я хочу удалить своего питомца
+Предусловие:
+1. В системе зарегистрирован пользователь с login Nastya@test.com и паролем 12345
+2. у пользователя есть добавленный питомец
+STR:
+1. Выполнить запрос POST/login с валидными данными пользователя
+2. Выполнить запрос удаления питомца DELETE/pet/{id} с корректными данными
+# ОР:
+# 1. Получаем токен
+# 2. Код ответа 200
+#
+# Comment:
+# В ответе на запрос GET/pet/{id} с данными из шага 2 приходит Код ответа 404 'Not Found'
